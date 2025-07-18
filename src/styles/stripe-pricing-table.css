@@ -1,0 +1,15 @@
+.pricing-table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pricing-table-container.light {
+  background-color: #fff;
+  color: #000;
+}
+
+.pricing-table-container.dark {
+  background-color: #0a0a0a;
+  color: #fff;
+}
