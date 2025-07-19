@@ -11,7 +11,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 
 const isProd = process.env.NODE_ENV === "production";
-const domain = ".salkaro.com"
 
 export const authOptions: NextAuthOptions = {
     cookies: {
@@ -22,58 +21,6 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? domain : undefined,
-            },
-        },
-        callbackUrl: {
-            name: isProd ? "__Secure-next-auth.callback-url" : "next-auth.callback-url",
-            options: {
-                sameSite: "lax",
-                path: "/",
-                secure: isProd,
-                domain: isProd ? domain : undefined,
-            },
-        },
-        csrfToken: {
-            name: isProd ? "__Host-next-auth.csrf-token" : "next-auth.csrf-token",
-            options: {
-                httpOnly: true,
-                sameSite: "lax",
-                path: "/",
-                secure: isProd,
-                domain: isProd ? domain : undefined,
-            },
-        },
-        pkceCodeVerifier: {
-            name: isProd ? "__Secure-next-auth.pkce.code_verifier" : "next-auth.pkce.code_verifier",
-            options: {
-                httpOnly: true,
-                sameSite: "lax",
-                path: "/",
-                secure: isProd,
-                domain: isProd ? domain : undefined,
-                maxAge: 900,
-            },
-        },
-        state: {
-            name: isProd ? "__Secure-next-auth.state" : "next-auth.state",
-            options: {
-                httpOnly: true,
-                sameSite: "lax",
-                path: "/",
-                secure: isProd,
-                domain: isProd ? domain : undefined,
-                maxAge: 900,
-            },
-        },
-        nonce: {
-            name: isProd ? domain : "next-auth.nonce",
-            options: {
-                httpOnly: true,
-                sameSite: "lax",
-                path: "/",
-                secure: isProd,
-                domain: isProd ? domain : undefined,
             },
         },
     },
