@@ -9,12 +9,15 @@ import LoadingSpinner from '../ui/spinner';
 
 const Page = () => {
     const router = useRouter();
-    const { status } = useSession();
+    const { data: session, status } = useSession();
+    console.log(session)
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
-            sessionStorage.removeItem('signInToken')
-            router.replace('/')
+            if (auth.currentUser) {
+                sessionStorage.removeItem('signInToken')
+                router.replace('/')
+            }
         })
         return unsubscribe
     }, [router])
