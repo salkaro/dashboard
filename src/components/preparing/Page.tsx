@@ -1,22 +1,34 @@
 "use client"
 
+// Local Imports
 import { auth } from '@/lib/firebase/config';
+import LoadingSpinner from '../ui/spinner';
+
+// External Imports
 import { onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react'
-import LoadingSpinner from '../ui/spinner';
+import { useEffect } from 'react';
 
 const Page = () => {
     const router = useRouter();
-    const { data: session, status } = useSession();
-    console.log(session)
+    const { status } = useSession();
+
+    function getCookie(name: string): string | null {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+    }
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
             if (auth.currentUser) {
-                sessionStorage.removeItem('signInToken')
-                router.replace('/')
+                const isProd = process.env.NODE_ENV === "production";
+                const domain = isProd ? "; domain=.salkaro.com" : "";
+                const secure = isProd ? "; secure" : "";
+
+                document.cookie = `signInToken=; path=/${domain}; max-age=0${secure}; samesite=Lax`;
+
+                router.push("/")
             }
         })
         return unsubscribe
@@ -24,11 +36,12 @@ const Page = () => {
 
     useEffect(() => {
         async function trySignIn() {
-            const firebaseToken = sessionStorage.getItem('signInToken')
+            const firebaseToken = getCookie('signInToken');
+            console.log("COOKIE", firebaseToken)
 
             if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
                 try {
-                    await signInWithCustomToken(auth, firebaseToken)
+                    await signInWithCustomToken(auth, firebaseToken);
                 } catch (err) {
                     console.error('Firebase sign-in failed', err)
                 }
