@@ -27,7 +27,7 @@ const Page = () => {
             if (session?.firebaseToken && !auth.currentUser) {
                 try {
                     await signInWithCustomToken(auth, session.firebaseToken);
-                    router.push("/")
+                    window.location.reload()
 
                     // Clear interval once signed in
                     if (intervalRef.current) {
