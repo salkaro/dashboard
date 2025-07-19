@@ -21,6 +21,58 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+            },
+        },
+        callbackUrl: {
+            name: isProd ? "__Secure-next-auth.callback-url" : "next-auth.callback-url",
+            options: {
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+            },
+        },
+        csrfToken: {
+            name: isProd ? "__Host-next-auth.csrf-token" : "next-auth.csrf-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+            },
+        },
+        pkceCodeVerifier: {
+            name: isProd ? "__Secure-next-auth.pkce.code_verifier" : "next-auth.pkce.code_verifier",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+                maxAge: 900,
+            },
+        },
+        state: {
+            name: isProd ? "__Secure-next-auth.state" : "next-auth.state",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+                maxAge: 900,
+            },
+        },
+        nonce: {
+            name: isProd ? "__Secure-next-auth.nonce" : "next-auth.nonce",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
             },
         },
     },
