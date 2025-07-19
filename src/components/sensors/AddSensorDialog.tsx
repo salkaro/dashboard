@@ -15,12 +15,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LucidePlus } from 'lucide-react'
 import { ISensorMeta } from '@/models/sensor'
+import { toast } from 'sonner'
 
 
 interface Props {
     addSensor: (sensor: ISensorMeta) => Promise<void>;
+    hitLimit: boolean;
 }
-const AddSensorDialog: React.FC<Props> = ({ addSensor }) => {
+const AddSensorDialog: React.FC<Props> = ({ addSensor, hitLimit }) => {
+    const [open, setOpen] = useState(false);
     const [sensor, setSensor] = useState<Omit<ISensorMeta, "id" | "createdAt" | "orgId">>({
         name: '',
         model: '',
@@ -35,8 +38,13 @@ const AddSensorDialog: React.FC<Props> = ({ addSensor }) => {
 
     async function handleSubmit() {
         if (!sensor.name || !sensor.units) {
-            alert("Name and Units are required");
+            toast("Invalid fields", { description: "Name and Units are required"});
             return;
+        }
+
+        if (hitLimit) {
+            displayLimitToast();
+            return
         }
 
         try {
@@ -46,13 +54,30 @@ const AddSensorDialog: React.FC<Props> = ({ addSensor }) => {
             console.error("Failed to add sensor:", err);
         } finally {
             setIsSubmitting(false);
+            setOpen(false);
         }
     }
 
+    function displayLimitToast() {
+        toast("You’ve reached your sensor limit", {
+            description: "To add more sensors, please upgrade your plan or remove existing ones."
+        });
+    }
+
+    if (hitLimit) {
+        return (
+            <Button onClick={displayLimitToast}>
+                <LucidePlus className="w-4 h-4 mr-2" />
+                Create New
+            </Button>
+        )
+    }
+
+
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setOpen(true)}>
                     <LucidePlus className="w-4 h-4 mr-2" />
                     Create New
                 </Button>

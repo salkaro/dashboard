@@ -8,14 +8,14 @@ import { Loader2Icon } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { IOrganisation } from '@/models/organisation'
 import { Label } from '../ui/label'
-import AddMemberDialog from './AddMemberDialog'
+import AddMemberDialog from './dialogs/AddMemberDialog'
 import { updateOrganisation } from '@/services/firebase/update'
 import { useSession } from 'next-auth/react'
 import { levelThreeAccess } from '@/utils/constants'
 
 const Organisation = () => {
     const { data: session } = useSession();
-    const { organisation } = useOrganisation();
+    const { organisation, refetch } = useOrganisation();
     const [updateOrg, setUpdateOrg] = useState<IOrganisation>();
     const [loading, setLoading] = useState(false);
     const hasLevelThreeAccess = levelThreeAccess.includes(session?.user.organisation?.role as string);
@@ -44,13 +44,17 @@ const Organisation = () => {
         } else {
             toast.success("Organisation updated successfully");
         }
+        refetch()
 
         setLoading(false);
     }
     return (
         <div className='space-y-4'>
             <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Organisation</h3>
+                <div>
+                    <h3 className="text-lg font-medium">Organisation</h3>
+                    <p className="text-muted-foreground text-sm">Your organisation information</p>
+                </div>
                 {hasLevelThreeAccess && <AddMemberDialog organisation={organisation as IOrganisation} />}
             </div>
             <Card>

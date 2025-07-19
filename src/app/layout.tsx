@@ -9,6 +9,7 @@ import Layout from "@/components/layout/layout";
 
 // Styles
 import "@/styles/globals.css";
+import "@/styles/button.css";
 
 
 const geistSans = Geist({

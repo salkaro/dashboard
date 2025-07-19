@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from "react"
+import React, { useMemo } from "react"
 import { SidebarTrigger } from "./sidebar"
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
@@ -30,10 +30,12 @@ export function SiteHeader({ title }: { title: string }) {
                     <BreadcrumbPage>{formatSegment(segment)}</BreadcrumbPage>
                 </BreadcrumbItem>
             ) : (
-                <BreadcrumbItem key={href}>
-                    <BreadcrumbLink href={href}>{formatSegment(segment)}</BreadcrumbLink>
+                <React.Fragment key={href}>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href={href}>{formatSegment(segment)}</BreadcrumbLink>
+                    </BreadcrumbItem>
                     <BreadcrumbSeparator />
-                </BreadcrumbItem>
+                </React.Fragment>
             );
         });
     }, [segments]);

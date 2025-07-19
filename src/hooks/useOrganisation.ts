@@ -1,5 +1,7 @@
 import { IOrganisation } from "@/models/organisation";
 import { retrieveOrganisation } from "@/services/firebase/retrieve";
+import { organisationCookieKey } from "@/utils/constants";
+import { getCookie, setCookie } from "@/utils/cookie-handlers";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -17,7 +19,7 @@ export function useOrganisation(): UseOrganisationReturn {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchOrganisation = useCallback(async () => {
+    const fetchOrganisation = useCallback(async ({ reload }: { reload?: boolean }) => {
         // Reset states
         setLoading(true);
         setError(null);
@@ -30,19 +32,34 @@ export function useOrganisation(): UseOrganisationReturn {
                 return;
             }
 
+            if (!reload) {
+                // Check if organisation data is already cached in cookies
+                const cached = getCookie(organisationCookieKey);
+                if (cached) {
+                    try {
+
+                        setOrganisation(JSON.parse(cached));
+                        setLoading(false);
+                        return;
+                    } catch {}
+                }
+            }
+
             // Retrieve organisation data
             const orgData = await retrieveOrganisation({
                 orgId: session.user.organisation.id
             });
 
             if (orgData) {
+                // Cache the organisation data in a cookie
+                setCookie(organisationCookieKey, JSON.stringify(orgData), { expires: 7, path: '/' });
                 setOrganisation(orgData);
             } else {
                 setOrganisation(null);
                 setError('Organisation not found');
             }
         } catch (err) {
-            console.log('Error fetching organisation:', err);
+            console.error('Error fetching organisation:', err);
             setError(err instanceof Error ? err.message : 'Failed to fetch organisation');
             setOrganisation(null);
         } finally {
@@ -64,13 +81,17 @@ export function useOrganisation(): UseOrganisationReturn {
             return;
         }
 
-        fetchOrganisation();
+        fetchOrganisation({});
     }, [session, status, fetchOrganisation]);
+
+    const refetch = useCallback(async () => {
+        await fetchOrganisation({ reload: true });
+    }, [fetchOrganisation]);
 
     return {
         organisation,
         loading,
         error,
-        refetch: fetchOrganisation,
+        refetch,
     };
 }

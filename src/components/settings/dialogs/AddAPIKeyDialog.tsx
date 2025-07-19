@@ -30,7 +30,7 @@ interface Props {
 
 const AddAPIKeyDialog: React.FC<Props> = ({ disabled, addToken }) => {
     const [name, setName] = useState('')
-    const [accessLevel, setAccessLevel] = useState<string>('2') // default to “Upload Only”
+    const [accessLevel, setAccessLevel] = useState<string>('2') 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     async function handleSubmit() {

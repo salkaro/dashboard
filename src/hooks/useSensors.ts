@@ -3,7 +3,8 @@ import { createSensor } from "@/services/firebase/create";
 import { deleteDevice } from "@/services/firebase/delete";
 import { retrieveOrganisation, retrieveDevices, retrieveDevice } from "@/services/firebase/retrieve";
 import { updateDevice } from "@/services/firebase/update";
-import { sensorsCol } from "@/utils/constants";
+import { sensorsCol, sensorsCookieKey } from "@/utils/constants";
+import { getCookie, setCookie } from "@/utils/cookie-handlers";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -28,37 +29,48 @@ export function useSensors({ sensorId }: UseSensorsOptions = {}): UseSensorsRetu
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
+    const cookieKey = sensorId ? `sensor-${sensorId}` : sensorsCookieKey;
     const orgId = session?.user?.organisation?.id ?? null;
 
-    const fetchSensors = useCallback(async () => {
+    const fetchSensors = useCallback(async ({ reload }: { reload?: boolean }) => {
         setLoading(true);
         setError(null);
 
         try {
-            const orgId = session?.user?.organisation?.id;
             if (!orgId) {
                 setSensors(null);
                 setLoading(false);
                 return;
             }
 
-            const organisation = await retrieveOrganisation({ orgId });
+            if (!reload) {
+                const cached = getCookie(cookieKey);
+                if (cached) {
+                    try {
+                        setSensors(JSON.parse(cached));
+                        setLoading(false);
+                        return;
+                    } catch { }
+                }
+            }
 
+            const organisation = await retrieveOrganisation({ orgId });
             if (!organisation) {
                 setSensors(null);
                 setError("Organisation not found");
                 return;
             }
 
+            let fetchedSensors: ISensorMeta[] | null;
             if (sensorId) {
-                // Fetch single sensor
                 const sensor = await retrieveDevice({ orgId, type: sensorsCol, deviceId: sensorId });
-                setSensors(sensor ? [sensor] : []);
+                fetchedSensors = sensor ? [sensor] : [];
             } else {
-                // Fetch all sensors
-                const sensorList = await retrieveDevices({ orgId, type: sensorsCol });
-                setSensors(sensorList ?? []);
+                fetchedSensors = await retrieveDevices({ orgId, type: sensorsCol }) ?? [];
             }
+
+            setSensors(fetchedSensors ?? []);
+            setCookie(cookieKey, JSON.stringify(fetchedSensors ?? []), { expires: 1 / 288 });
         } catch (err) {
             console.error("Error fetching sensors:", err);
             setError(err instanceof Error ? err.message : "Failed to fetch sensors");
@@ -66,7 +78,7 @@ export function useSensors({ sensorId }: UseSensorsOptions = {}): UseSensorsRetu
         } finally {
             setLoading(false);
         }
-    }, [session?.user?.organisation?.id, sensorId]);
+    }, [sensorId, orgId, cookieKey]);
 
     const addSensor = useCallback(
         async (sensor: ISensorMeta) => {
@@ -81,32 +93,41 @@ export function useSensors({ sensorId }: UseSensorsOptions = {}): UseSensorsRetu
             };
 
             try {
-                await createSensor({ sensor: newSensor, orgId });
-                await fetchSensors();
+                const { data } = await createSensor({ sensor: newSensor, orgId });
+                if (data) {
+                    const updatedSensors = [...(sensors ?? []), data];
+                    setSensors(updatedSensors);
+                    setCookie(cookieKey, JSON.stringify(updatedSensors), { expires: 1 / 288 });
+                }
             } catch (err) {
                 console.error("Error adding sensor:", err);
                 setError(err instanceof Error ? err.message : "Failed to add sensor");
             }
         },
-        [orgId, fetchSensors]
+        [orgId, cookieKey, sensors]
     );
 
     const editSensor = useCallback(
-        async (sensor: ISensorMeta) => {
+        async (updatedSensor: ISensorMeta) => {
             if (!orgId) {
                 throw new Error("No organisation ID found.");
             }
 
             try {
-                const { error } = await updateDevice({ device: sensor, orgId, type: sensorsCol });
+                const { error } = await updateDevice({ device: updatedSensor, orgId, type: sensorsCol });
                 if (error) throw error
-                await fetchSensors();
+
+                const updatedSensors = (sensors ?? []).map(sensor =>
+                    sensor.id === updatedSensor.id ? updatedSensor : sensor
+                );
+                setSensors(updatedSensors);
+                setCookie(cookieKey, JSON.stringify(updatedSensors), { expires: 1 / 288 });
             } catch (err) {
                 console.error("Error editing sensor:", err);
                 setError(err instanceof Error ? err.message : "Failed to edit sensor");
             }
         },
-        [orgId, fetchSensors]
+        [orgId, cookieKey, sensors]
     );
 
     const deleteSensor = useCallback(
@@ -117,13 +138,15 @@ export function useSensors({ sensorId }: UseSensorsOptions = {}): UseSensorsRetu
 
             try {
                 await deleteDevice({ deviceId: sensorId, orgId, type: sensorsCol });
-                await fetchSensors();
+                const updatedSensors = (sensors ?? []).filter(sensor => sensor.id !== sensorId);
+                setSensors(updatedSensors);
+                setCookie(cookieKey, JSON.stringify(updatedSensors), { expires: 1 / 288 });
             } catch (err) {
                 console.error("Error deleting sensor:", err);
                 setError(err instanceof Error ? err.message : "Failed to delete sensor");
             }
         },
-        [orgId, fetchSensors]
+        [orgId, cookieKey, sensors]
     );
 
     useEffect(() => {
@@ -139,14 +162,19 @@ export function useSensors({ sensorId }: UseSensorsOptions = {}): UseSensorsRetu
             return;
         }
 
-        fetchSensors();
+        fetchSensors({});
     }, [status, session, fetchSensors]);
+
+    const refetch = useCallback(async () => {
+        await fetchSensors({ reload: true });
+    }, [fetchSensors]);
+
 
     return {
         sensors,
         loading,
         error,
-        refetch: fetchSensors,
+        refetch,
         addSensor,
         editSensor,
         deleteSensor

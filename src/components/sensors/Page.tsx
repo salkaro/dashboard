@@ -16,37 +16,22 @@ import EditSensorDialog from './EditSensorDialog';
 import { useRouter } from 'next/navigation';
 import { SearchIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { levelTwoAccess } from '@/utils/constants';
+import { levelTwoAccess, sensorLimits } from '@/utils/constants';
+import { useOrganisation } from '@/hooks/useOrganisation';
 
 const Page = () => {
     const router = useRouter();
     const { data: session } = useSession();
     const hasLevelTwoAccess = levelTwoAccess.includes(session?.user.organisation?.role as string);
+    const { organisation } = useOrganisation();
 
     const { sensors, loading, addSensor, editSensor, deleteSensor } = useSensors();
     const [selectedSensors, setSelectedSensors] = useState<Set<string>>(new Set());
     const [searchTerm, setSearchTerm] = useState('');
+    const sensorLimit = sensorLimits[organisation?.subscription as keyof typeof sensorLimits] ?? 0;
 
-    if (loading) {
-        return (
-            <div className='w-full flex justify-center items-center min-h-48'>
-                <LoadingSpinner />
-            </div>
-        )
-    }
 
-    if (!sensors || sensors.length === 0) {
-        return (
-            <div className='space-y-4'>
-                <div className="flex justify-end items-center">
-                    <AddSensorDialog addSensor={addSensor} />
-                </div>
-                <NoContent text="No sensors found" />
-            </div>
-        );
-    }
-
-    const allSelected = sensors.length > 0 && selectedSensors.size === sensors.length;
+    const allSelected = (sensors?.length ?? 0) > 0 && selectedSensors.size === (sensors?.length ?? 0);
 
     function toggleSelectAll() {
         if (allSelected) {
@@ -75,7 +60,7 @@ const Page = () => {
         }
     }
 
-    const filteredSensors = sensors.filter((sensor) => {
+    const filteredSensors = sensors?.filter((sensor) => {
         const query = searchTerm.toLowerCase();
         return (
             sensor.id?.toLowerCase().includes(query) ||
@@ -92,6 +77,7 @@ const Page = () => {
         router.push(`/sensors/${sensorId}`)
     }
 
+
     return (
         <div className='space-y-4'>
             <div className="relative flex justify-between items-center">
@@ -104,12 +90,20 @@ const Page = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full sm:max-w-sm pl-10 pr-20 rounded-full h-9"
                 />
-                {hasLevelTwoAccess && <AddSensorDialog addSensor={addSensor} />}
+                {hasLevelTwoAccess && <AddSensorDialog addSensor={addSensor} hitLimit={(sensors?.length ?? 0) >= sensorLimit} />}
             </div>
 
-            {filteredSensors.length === 0 ? (
+            {loading && (
+                <div className='w-full flex justify-center items-center min-h-48'>
+                    <LoadingSpinner />
+                </div>
+            )}
+
+            {(!loading && filteredSensors && filteredSensors.length === 0) && (
                 <NoContent text="No sensors match your search" />
-            ) : (
+            )}
+
+            {(!loading && filteredSensors && filteredSensors.length > 0) && (
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -130,7 +124,7 @@ const Page = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredSensors.map((sensor) => (
+                        {filteredSensors?.map((sensor) => (
                             <TableRow key={sensor.id}>
                                 {hasLevelTwoAccess && (
                                     <TableCell>

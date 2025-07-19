@@ -11,6 +11,8 @@ import { Button } from "../ui/button"
 import { updateUser } from "@/services/firebase/update"
 import { toast } from "sonner"
 import { Loader2Icon } from "lucide-react"
+import DeleteUserDialog from "./dialogs/DeleteUserDialog"
+import { Separator } from "../ui/separator"
 
 
 const Overview = () => {
@@ -43,7 +45,11 @@ const Overview = () => {
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-medium">Personal</h3>
+            <div>
+                <h3 className="text-lg font-medium">Personal</h3>
+                <p className="text-muted-foreground text-sm">Your personal information</p>
+            </div>
+
             <Card>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
@@ -72,7 +78,7 @@ const Overview = () => {
                 <CardFooter className="justify-end">
                     <Button onClick={handleSave} disabled={loading}>
                         {loading && <Loader2Icon className="animate-spin" />}
-                        {loading ? "Updating": "Save Changes"}
+                        {loading ? "Updating" : "Save Changes"}
                     </Button>
                 </CardFooter>
             </Card>
@@ -81,6 +87,19 @@ const Overview = () => {
                     ? formatDistanceToNow(user?.metadata.createdAt, { addSuffix: true })
                     : "N/A"}
             </div>
+
+            <div>
+                <h3 className="text-lg font-medium">Danger zone</h3>
+                <p className="text-muted-foreground text-sm">Irreversible and destructive actions</p>
+            </div>
+            <Card>
+                <CardContent>
+                    <h1 className="text-lg font-medium mb-2">Delete user</h1>
+                    <Separator />
+                    <p className="my-6 text-muted-foreground">Once your account is deleted, it cannot be recovered. Please make sure you&apos;re absolutely certain.</p>
+                    <DeleteUserDialog />
+                </CardContent>
+            </Card>
         </div>
     )
 }

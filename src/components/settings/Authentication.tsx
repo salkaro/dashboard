@@ -1,22 +1,24 @@
 "use client";
 
 // Local Imports
-import { useOrganisation } from '@/hooks/useOrganisation';
-import { Button } from '../ui/button';
-import { Check, Copy, Eye, EyeOff, Key, RotateCcw, Trash2 } from 'lucide-react';
+import Alert from '../ui/alert';
 import NoContent from '../ui/no-content';
+import { Button } from '../ui/button';
+import { useTokens } from '@/hooks/useTokens';
 import LoadingSpinner from '../ui/spinner';
+import { OrgRoleType } from '@/models/organisation';
+import AddAPIKeyDialog from './dialogs/AddAPIKeyDialog';
+import { updateAPIKey } from '@/services/firebase/update';
+import { generateApiKey } from '@/utils/generate';
+import { useOrganisation } from '@/hooks/useOrganisation';
+import { apiTokenAccessLevels, apiTokenAccessLevelsName } from '@/utils/constants';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+
+// External Imports
+import { Check, Copy, Eye, EyeOff, Key, RotateCcw, Trash2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { generateApiKey } from '@/utils/generate';
-import { useSession } from 'next-auth/react';
-import { updateAPIKey } from '@/services/firebase/update';
-import { OrgRoleType } from '@/models/organisation';
-import Alert from '../ui/alert';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
-import { apiTokenAccessLevels, apiTokenAccessLevelsName } from '@/utils/constants';
-import { useTokens } from '@/hooks/useTokens';
-import AddAPIKeyDialog from './AddAPIKeyDialog';
 
 const Authentication = () => {
     const { data: session } = useSession();

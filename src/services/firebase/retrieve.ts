@@ -1,11 +1,28 @@
-import { firestore } from "@/lib/firebase/config";
+// Local Impoorts
 import { IUser } from "@/models/user";
-import { apiKeysCol, devicesCol, IDeviceType, organisationsCol, tokensCol, usersCol } from "@/utils/constants";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { createUser } from "./admin-create";
-import { IOrganisation } from "@/models/organisation";
-import { ISensorMeta } from "@/models/sensor";
 import { IToken } from "@/models/token";
+import { createUser } from "./admin-create";
+import { ISensorMeta } from "@/models/sensor";
+import { IOrganisation } from "@/models/organisation";
+import { auth, firestore } from "@/lib/firebase/config";
+import { apiKeysCol, devicesCol, IDeviceType, organisationsCol, tokensCol, usersCol } from "@/utils/constants";
+
+// External Imports
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+
+export async function retrieveIdToken() {
+    try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const idToken = await user?.getIdToken();
+        if (!idToken) return;
+
+        return idToken;
+    } catch (error) {
+        console.error(error)
+    }
+}
 
 export async function retrieveUserAndCreate({ uid, email }: { uid: string, email?: string | null }): Promise<IUser | void> {
     try {

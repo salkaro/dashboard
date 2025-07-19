@@ -4,7 +4,7 @@ import { ISensorMeta } from "@/models/sensor";
 import { devicesCol, inviteCodesCol, sensorsCol } from "@/utils/constants";
 import { collection, doc, setDoc } from "firebase/firestore";
 
-export async function createSensor({ sensor, orgId }: { sensor: ISensorMeta, orgId: string }): Promise<{ error?: string }> {
+export async function createSensor({ sensor, orgId }: { sensor: ISensorMeta, orgId: string }): Promise<{ error?: string, data?: ISensorMeta }> {
     try {
         const sensorRef = doc(collection(firestore, devicesCol, orgId, sensorsCol));
         const sensorWithId: ISensorMeta = {
@@ -12,7 +12,7 @@ export async function createSensor({ sensor, orgId }: { sensor: ISensorMeta, org
             id: sensorRef.id,
         };
         await setDoc(sensorRef, sensorWithId);
-        return {};
+        return { data: sensorWithId };
     } catch (error) {
         return { error: `${error}` };
     }

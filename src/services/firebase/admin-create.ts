@@ -7,7 +7,6 @@ import { firestoreAdmin } from "@/lib/firebase/config-admin";
 import { createStripeCustomer } from "../stripe/create";
 import { organisationsCol, usersCol } from "@/utils/constants";
 
-// External Imports
 
 export async function createUser({ uid, email }: { uid: string, email: string }): Promise<IUser | void> {
     try {

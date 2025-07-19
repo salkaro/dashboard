@@ -42,6 +42,7 @@ const EditSensorDialog: React.FC<Props> = ({ fillSensor, editSensor }) => {
             console.error("Failed to edit sensor:", err);
         } finally {
             setIsSubmitting(false);
+            setOpen(false);
         }
     }
 

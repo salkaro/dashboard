@@ -28,7 +28,7 @@ import { createMemberInvite } from '@/services/firebase/create'
 import { IMemberInvite } from '@/models/invite'
 import { memberLimits } from '@/utils/constants'
 
-const JOIN_LINK_BASE = "https://salkaro.com/verify-member"
+//const JOIN_LINK_BASE = "https://app.salkaro.com/api/verify-member"
 
 const roleOptions: OrgRoleType[] = ["viewer", "developer", "admin"]
 
@@ -101,7 +101,7 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
                 <DialogHeader>
                     <DialogTitle>Invite New Member</DialogTitle>
                     <DialogDescription>
-                        Generate a verification code and invite link with role access.
+                        Generate a verification code with role access.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -169,7 +169,7 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
                                 </div>
                             </div>
 
-                            {/* Copy Link */}
+                            {/* Copy Link 
                             <div className="flex items-center justify-between">
                                 <Input className="text-sm break-all" value={`${JOIN_LINK_BASE}?code=${code}`} readOnly />
                                 <div className="flex space-x-2">
@@ -184,6 +184,7 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
                                     </Button>
                                 </div>
                             </div>
+                            */}
                         </div>
                     )}
                 </div>

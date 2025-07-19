@@ -27,11 +27,11 @@ export const apiTokenRetentionLevels = {
 }
 
 export const apiTokenAccessLevelsName = {
-    0: "No Access", 
-    1: "Read Only", 
+    0: "No Access",
+    1: "Read Only",
     2: "Upload Only",
-    3: "Read + Upload", 
-    4: "Admin", 
+    3: "Read + Upload",
+    4: "Admin",
 }
 
 
@@ -42,6 +42,25 @@ export const memberLimits = {
     "pro": 50,
     "enterprise": -1,
 }
+
+export const sensorLimits = {
+    "free": 2,
+    "hobby": 5,
+    "essential": 20,
+    "pro": 100,
+    "enterprise": 1000,
+}
+
+
+export const tokensCookieKey = "tokens";
+export const sensorsCookieKey = "sensors";
+export const organisationCookieKey = "organisation";
+
+export const cookieList = [
+    tokensCookieKey,
+    sensorsCookieKey,
+    organisationCookieKey
+]
 
 
 export const levelOneAccess = ["viewer", "developer", "admin", "owner"];
