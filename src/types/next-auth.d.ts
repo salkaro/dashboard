@@ -11,13 +11,11 @@ declare module "next-auth" {
         id: string;
         email: string;
         user: IUser;
-        firebaseToken: string;
     }
 
     interface JWT extends DefaultJWT {
         id: string;
         email: string;
         user: IUser;
-        firebaseToken: string;
     }
 }

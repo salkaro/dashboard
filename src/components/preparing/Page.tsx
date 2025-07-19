@@ -2,63 +2,38 @@
 
 import { auth } from '@/lib/firebase/config';
 import { onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import LoadingSpinner from '../ui/spinner';
 
 const Page = () => {
     const router = useRouter();
-    const { data: session, status } = useSession();
-
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const { status } = useSession();
 
     useEffect(() => {
-        // Kick off a poll on mount
-        const poll = async () => {
-            try {
-                // Refresh NextAuth session cookie
-                await getSession();
-            } catch (e) {
-                console.debug("Session refresh failed:", e);
-            }
+        const unsubscribe = onAuthStateChanged(auth, async () => {
+            sessionStorage.removeItem('signInToken')
+            router.replace('/')
+        })
+        return unsubscribe
+    }, [router])
 
-            // If we now have a firebaseToken and aren't signed in, try sign‑in
-            if (session?.firebaseToken && !auth.currentUser) {
+    useEffect(() => {
+        async function trySignIn() {
+            const firebaseToken = sessionStorage.getItem('signInToken')
+
+            if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
                 try {
-                    await signInWithCustomToken(auth, session.firebaseToken);
-                    window.location.reload()
-
-                    // Clear interval once signed in
-                    if (intervalRef.current) {
-                        clearInterval(intervalRef.current);
-                        intervalRef.current = null;
-                    }
+                    await signInWithCustomToken(auth, firebaseToken)
                 } catch (err) {
-                    console.debug("Re-auth attempt failed, will retry in 1s", err);
+                    console.error('Firebase sign-in failed', err)
                 }
-            } else if (auth.currentUser) {
-                router.push("/")
             }
-        };
+        }
 
-        // Start immediate poll + interval
-        poll();
-        intervalRef.current = setInterval(poll, 1000);
-
-        // Also clear if Firebase reports a user
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-            }
-        });
-
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            unsubscribe();
-        };
-    }, [session?.firebaseToken, status, router]);
+        trySignIn()
+    }, [status])
 
     return (
         <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
