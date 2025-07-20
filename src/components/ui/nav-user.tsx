@@ -1,7 +1,5 @@
 "use client"
 
-import { auth } from "@/lib/firebase/config";
-
 import {
     ChevronsUpDown,
     CreditCard,
@@ -29,13 +27,12 @@ import {
 
 import { useSession } from "next-auth/react"
 
-import { signOut as nextSignOut } from "next-auth/react";
-import { signOut as firebaseSignout } from "firebase/auth";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import { createBillingPortalUrl } from "@/services/stripe/create";
 import { useOrganisation } from "@/hooks/useOrganisation";
 import { toast } from "sonner";
 import { levelThreeAccess } from "@/utils/constants";
+import { signOut } from "@/services/sign-out";
 
 export function NavUser() {
     const { isMobile } = useSidebar()
@@ -44,8 +41,7 @@ export function NavUser() {
     const hasLevelThreeAccess = levelThreeAccess.includes(session?.user.organisation?.role as string);
 
     function handleSignOut() {
-        firebaseSignout(auth);
-        nextSignOut({ callbackUrl: "https://salkaro.com" })
+        signOut()
     };
 
     async function handleBillingPortal() {

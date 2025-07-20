@@ -1,18 +1,27 @@
 "use client";
 
 // Local Imports
-import { IUser } from '@/models/user';
+import { useOrganisation } from '@/hooks/useOrganisation';
 
 // External Imports
-import React, { useEffect } from 'react'
-import { useSession } from 'next-auth/react';
+import React, { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes';
+import { createCustomerSession } from '@/services/stripe/create';
 
 const StripePricingTable = () => {
     const { theme } = useTheme();
-    const { data: session } = useSession();
+    const { organisation } = useOrganisation();
+    const [clientSecret, setClientSecret] = useState<string>();
 
-    const user = session?.user as IUser;
+    useEffect(() => {
+        async function createSession() {
+            if (!clientSecret && organisation?.stripeCustomerId) {
+                const secret = await createCustomerSession({ customerId: organisation.stripeCustomerId });
+                setClientSecret(secret as string)
+            }
+        }
+        createSession()
+    })
 
     useEffect(() => {
         const script = document.createElement('script');
@@ -28,7 +37,7 @@ const StripePricingTable = () => {
     return React.createElement("stripe-pricing-table", {
         "pricing-table-id": theme === "dark" ? "prctbl_1RlEyTJtdRMvYIcKNKgxzTUg" : "prctbl_1RlEzqJtdRMvYIcKFgu8oyin",
         "publishable-key": process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-        "customer-email": user?.email
+        "customer-session-client-secret": clientSecret,
     })
 
 }

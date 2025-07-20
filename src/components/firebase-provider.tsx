@@ -5,11 +5,11 @@ import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth"
 import { auth } from "@/lib/firebase/config"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { signOut } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import { Separator } from "./ui/separator"
 import { ArrowRight } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { signOut } from "@/services/sign-out"
 
 interface Props {
     children: React.ReactNode;
@@ -67,8 +67,8 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
         trySignIn()
     }, [status])
 
-    const handleRelogin = async () => {
-        await signOut(auth)
+    const handleReLogin = async () => {
+        await signOut();
         router.push("https://auth.salkaro.com/login")
     }
 
@@ -83,7 +83,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
                     </DialogHeader>
                     <p className="text-muted-foreground">Your session has expired or you’ve been logged out. Please log back in to continue.</p>
                     <div className="flex justify-center items-center mt-4">
-                        <Button onClick={handleRelogin}>
+                        <Button onClick={handleReLogin}>
                             Go to login
                             <ArrowRight />
                         </Button>

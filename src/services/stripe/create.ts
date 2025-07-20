@@ -61,3 +61,26 @@ export async function createStripeCustomer({ email }: { email: string }) {
         throw error;
     }
 };
+
+
+export async function createCustomerSession({ customerId }: { customerId: string }) {
+    const stripeAPIKey = process.env.STRIPE_API_KEY as string;
+
+    if (!stripeAPIKey) {
+        throw new Error('Stripe API key not found');
+    }
+
+    const stripe = new Stripe(stripeAPIKey);
+
+    try {
+        const session = await stripe.customerSessions.create({
+            customer: customerId,
+            components: { pricing_table: { enabled: true } },
+        })
+
+        return session.client_secret;
+    } catch (error) {
+        console.error('Error creating customer session:', error);
+        throw error;
+    }
+}
