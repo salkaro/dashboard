@@ -21,9 +21,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 const Authentication = () => {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const { organisation, loading: orgLoading, refetch: refreshOrganisation } = useOrganisation();
-    const { tokens, loading: tokensLoading, error: tokensError, refetch: refreshTokens } = useTokens(organisation?.id ?? null);
+    const { tokens, loading: tokensLoading, error: tokensError, refetch: refreshTokens } = useTokens(organisation?.id as string);
 
     // For showing/hiding API keys
     const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
@@ -32,16 +32,19 @@ const Authentication = () => {
 
     const userRole = session?.user.organisation?.role as OrgRoleType | undefined;
 
-    async function createNewAPIKey({ name, accessLevel }: { name: string; accessLevel: number }) {
+    async function createNewAPIKey({ name, accessLevel }: { name: string; accessLevel: number }): Promise<{ error?: boolean }> {
         try {
-            if (!organisation?.id || !organisation.subscription) return;
+            if (!organisation?.id || !organisation.subscription) {
+                toast("Failed to add API key:", { description: `Your organisation wasn't found. Please try again.` });
+                return { error: true };
+            };
             if (tokens && tokens.length >= 5) {
                 toast("API key limit hit", { description: "You must delete an existing API key first" });
-                return;
+                return { error: true };
             }
             if (!userRole || userRole === "viewer") {
                 toast("Invalid permissions", { description: "You do not have sufficient permission to create a new API key" });
-                return;
+                return { error: true };
             }
             const token = generateApiKey(accessLevel as keyof typeof apiTokenAccessLevels, organisation.subscription);
             // Attach metadata
@@ -57,8 +60,11 @@ const Authentication = () => {
 
             await refreshTokens();
             await refreshOrganisation();
+
+            return {}
         } catch (error) {
-            toast("Failed to create token", { description: `${error}` })
+            toast("Failed to create token", { description: `${error}` });
+            return { error: true };
         }
     }
 
@@ -143,7 +149,7 @@ const Authentication = () => {
         );
     }
 
-    if (tokensError) {
+    if (organisation?.id && status !== "loading" && !orgLoading && !tokensLoading && tokensError) {
         return <p className="text-red-600">Error loading tokens: {tokensError}</p>;
     }
 

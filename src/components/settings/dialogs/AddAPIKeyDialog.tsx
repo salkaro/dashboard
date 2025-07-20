@@ -22,34 +22,40 @@ import {
 } from "@/components/ui/select"
 import { LucidePlus } from 'lucide-react'
 import { apiTokenAccessLevelsName } from '@/utils/constants'
+import { Separator } from '@/components/ui/separator'
+import { toast } from 'sonner'
 
 interface Props {
     disabled?: boolean;
-    addToken: (data: { name: string; accessLevel: number }) => Promise<void>;
+    addToken: (data: { name: string; accessLevel: number }) => Promise<{ error?: boolean }>;
 }
 
 const AddAPIKeyDialog: React.FC<Props> = ({ disabled, addToken }) => {
     const [name, setName] = useState('')
-    const [accessLevel, setAccessLevel] = useState<string>('2') 
+    const [open, setOpen] = useState(false);
+    const [accessLevel, setAccessLevel] = useState<string>('2')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     async function handleSubmit() {
         if (!name.trim()) {
-            alert("Name is required")
-            return
+            toast("Name is required", {description: "Please provide all the relavent details to create an API key."})
+            return;
         }
         try {
             setIsSubmitting(true)
-            await addToken({ name: name.trim(), accessLevel: Number(accessLevel) })
-        } catch (err) {
-            console.error("Failed to add API key:", err)
+            const { error } = await addToken({ name: name.trim(), accessLevel: Number(accessLevel) })
+            if (error) return;
+            toast("API key added", { description: `Successfully added '${name}' as an API key` });
+        } catch {
+            toast("Failed to add API key:", { description: `An error occured when trying to add '${name}' as an API key. Please try again.` });
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
+            setOpen(false);
         }
     }
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm" disabled={disabled}>
                     <LucidePlus className="w-4 h-4 mr-2" />
@@ -58,7 +64,8 @@ const AddAPIKeyDialog: React.FC<Props> = ({ disabled, addToken }) => {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>New API Key</DialogTitle>
+                    <DialogTitle className='mb-2'>New API Key</DialogTitle>
+                    <Separator />
                     <DialogDescription>
                         Enter a name and select an access level for this API key.
                     </DialogDescription>

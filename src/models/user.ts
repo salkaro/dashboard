@@ -10,15 +10,16 @@ interface IUser {
     firstname?: string | null;
     lastname?: string | null;
     metadata?: IMetaData;
-    organisation?: IOrganisation;
+    organisation?: IUserOrganisation;
 }
 
 
-interface IOrganisation {
+interface IUserOrganisation {
     id?: string | null;
     role?: OrgRoleType | null;
     joinedAt?: number | null;
 }
+
 
 interface IAuthentication {
     emailVerified?: EmailVerification;
@@ -31,4 +32,4 @@ interface IMetaData {
 }
 
 
-export type { IUser }
+export type { IUser, IUserOrganisation }

@@ -19,7 +19,6 @@ export function useTokens(orgId: string | null): UseTokensReturn {
     const fetchTokens = useCallback(async ({ reload }: { reload?: boolean }) => {
         if (!orgId) {
             setTokens(null);
-            setError("No organization ID provided");
             return;
         }
 

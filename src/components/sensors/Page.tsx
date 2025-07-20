@@ -18,6 +18,7 @@ import { SearchIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { levelTwoAccess, sensorLimits } from '@/utils/constants';
 import { useOrganisation } from '@/hooks/useOrganisation';
+import CreateOrganisationButton from '../ui/create-organisation-button';
 
 const Page = () => {
     const router = useRouter();
@@ -29,7 +30,6 @@ const Page = () => {
     const [selectedSensors, setSelectedSensors] = useState<Set<string>>(new Set());
     const [searchTerm, setSearchTerm] = useState('');
     const sensorLimit = sensorLimits[organisation?.subscription as keyof typeof sensorLimits] ?? 0;
-
 
     const allSelected = (sensors?.length ?? 0) > 0 && selectedSensors.size === (sensors?.length ?? 0);
 
@@ -77,6 +77,10 @@ const Page = () => {
         router.push(`/sensors/${sensorId}`)
     }
 
+
+    if (!loading && !organisation) {
+        return <CreateOrganisationButton />
+    }
 
     return (
         <div className='space-y-4'>

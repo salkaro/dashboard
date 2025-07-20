@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ISensorMeta } from '@/models/sensor'
 import { DropdownMenuItem } from '../ui/dropdown-menu'
+import { Separator } from '../ui/separator'
 
 
 interface Props {
@@ -59,7 +60,8 @@ const EditSensorDialog: React.FC<Props> = ({ fillSensor, editSensor }) => {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Sensor</DialogTitle>
+                        <DialogTitle className='mb-2'>Edit Sensor</DialogTitle>
+                        <Separator />
                         <DialogDescription>
                             Fill out the form to edit sensor in your organisation.
                         </DialogDescription>

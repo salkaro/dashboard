@@ -54,11 +54,13 @@ export const sensorLimits = {
 
 export const tokensCookieKey = "tokens";
 export const sensorsCookieKey = "sensors";
+export const membersCookieKey = "members";
 export const organisationCookieKey = "organisation";
 
 export const cookieList = [
     tokensCookieKey,
     sensorsCookieKey,
+    membersCookieKey,
     organisationCookieKey
 ]
 
@@ -67,3 +69,11 @@ export const levelOneAccess = ["viewer", "developer", "admin", "owner"];
 export const levelTwoAccess = ["developer", "admin", "owner"];
 export const levelThreeAccess = ["admin", "owner"];
 export const levelFourAccess = ["owner"];
+
+
+export const levelsToIndex = {
+    "viewer": "0",
+    "developer": "1",
+    "admin": "2",
+    "owner": "3",
+}

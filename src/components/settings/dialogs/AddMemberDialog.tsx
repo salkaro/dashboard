@@ -27,6 +27,7 @@ import { IOrganisation, OrgRoleType } from '@/models/organisation'
 import { createMemberInvite } from '@/services/firebase/create'
 import { IMemberInvite } from '@/models/invite'
 import { memberLimits } from '@/utils/constants'
+import { Separator } from '@/components/ui/separator'
 
 //const JOIN_LINK_BASE = "https://app.salkaro.com/api/verify-member"
 
@@ -99,7 +100,8 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Invite New Member</DialogTitle>
+                    <DialogTitle className='mb-2'>Invite New Member</DialogTitle>
+                    <Separator />
                     <DialogDescription>
                         Generate a verification code with role access.
                     </DialogDescription>
@@ -108,8 +110,8 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
                 <div className='pt-4'>
                     {/* Role */}
                     {!code && (
-                        <div className='grid grid-rows-2 sm:grid-cols-2 gap-6 sm:grid-0'>
-                            <div className='space-y-4'>
+                        <div>
+                            <div className='grid grid-rows-2 sm:grid-cols-2 sm:grid-rows-1 gap-6 sm:grid-0'>
                                 <div className='flex flex-row gap-6 items-center'>
                                     <Label htmlFor="role">
                                         Role
@@ -150,11 +152,14 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
                                     />
                                 </div>
                             </div>
-                            <div className='text-sm'>
-                                {roleInfo[role as keyof typeof roleInfo]}
+                            <div className='text-sm text-muted-foreground mt-6 grid grid-cols-12 px-2 items-center'>
+                                <div className='col-span-1 text-2xl pb-1'>•</div>
+                                <div className='col-span-11'>{roleInfo[role as keyof typeof roleInfo]}</div>
                             </div>
                         </div>
                     )}
+
+
 
                     {/* Code + Link display */}
                     {code && (
@@ -189,11 +194,13 @@ const AddMemberDialog: React.FC<Props> = ({ organisation, disabled }) => {
                     )}
                 </div>
 
-                <DialogFooter>
-                    <Button onClick={handleSubmit} disabled={isSubmitting}>
-                        {isSubmitting ? 'Generating...' : 'Generate Invitation'}
-                    </Button>
-                </DialogFooter>
+                {!code && (
+                    <DialogFooter>
+                        <Button onClick={handleSubmit} disabled={isSubmitting}>
+                            {isSubmitting ? 'Generating...' : 'Generate Invitation'}
+                        </Button>
+                    </DialogFooter>
+                )}
             </DialogContent>
         </Dialog>
     )

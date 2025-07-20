@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { LucidePlus } from 'lucide-react'
 import { ISensorMeta } from '@/models/sensor'
 import { toast } from 'sonner'
+import { Separator } from '../ui/separator'
 
 
 interface Props {
@@ -38,7 +39,7 @@ const AddSensorDialog: React.FC<Props> = ({ addSensor, hitLimit }) => {
 
     async function handleSubmit() {
         if (!sensor.name || !sensor.units) {
-            toast("Invalid fields", { description: "Name and Units are required"});
+            toast("Invalid fields", { description: "Name and Units are required" });
             return;
         }
 
@@ -84,7 +85,8 @@ const AddSensorDialog: React.FC<Props> = ({ addSensor, hitLimit }) => {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add New Sensor</DialogTitle>
+                    <DialogTitle className='mb-2'>Add New Sensor</DialogTitle>
+                    <Separator />
                     <DialogDescription>
                         Fill out the form to register a new sensor in your organisation.
                     </DialogDescription>

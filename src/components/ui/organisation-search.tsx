@@ -1,15 +1,15 @@
 // External Imports
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
+import { BookText, Home, Key, LucideProps, RadioTower, SearchIcon, Settings, Store, UserRound, Wallet } from 'lucide-react';
 
 // Local Imports
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
-import { Input } from './input';
-import { BookText, Home, Key, LucideProps, RadioTower, SearchIcon, Settings, Store, UserRound, Wallet } from 'lucide-react';
-import NoContent from './no-content';
-import { useSensors } from '@/hooks/useSensors';
-import { useSession } from 'next-auth/react';
 import { levelThreeAccess, levelTwoAccess } from '@/utils/constants';
+import { useSensors } from '@/hooks/useSensors';
+import NoContent from './no-content';
+import { Input } from './input';
 
 
 interface IItem {
@@ -23,13 +23,14 @@ interface IItem {
 
 const OrganisationSearch: React.FC = () => {
     const router = useRouter();
-    const { data: session } = useSession();
-    const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState("");
     const { sensors } = useSensors();
+    const [open, setOpen] = useState(false);
+    const { data: session } = useSession();
+    const [query, setQuery] = useState("");
+    const [items, setItems] = useState<IItem[]>([]);
+
     const hasLevelTwoAccess = levelTwoAccess.includes(session?.user.organisation?.role as string);
     const hasLevelThreeAccess = levelThreeAccess.includes(session?.user.organisation?.role as string);
-    const [items, setItems] = useState<IItem[]>([]);
 
     useEffect(() => {
         const handle = (e: KeyboardEvent) => {
@@ -76,16 +77,17 @@ const OrganisationSearch: React.FC = () => {
             },
         ];
 
-        if (!sensors) return;
-
-        // Inject sensor sub-items under "Sensors"
-        const sensorSubItems: IItem[] = sensors.map((s) => ({
-            title: s.name ?? `Sensor ${s.id}`,
-            description: `${s.model ?? ""} • ${s.location ?? ""}`.trim(),
-            type: "device",
-            link: `/sensors/${s.id}`,
-            icon: RadioTower,
-        }));
+        let sensorSubItems: IItem[];
+        if (sensors) {
+            // Inject sensor sub-items under "Sensors"
+            sensorSubItems = sensors.map((s) => ({
+                title: s.name ?? `Sensor ${s.id}`,
+                description: `${s.model ?? ""} • ${s.location ?? ""}`.trim(),
+                type: "device",
+                link: `/sensors/${s.id}`,
+                icon: RadioTower,
+            }));
+        };
 
         // Build settings sub-items dynamically based on access level
         const settingsSubItems: IItem[] = [

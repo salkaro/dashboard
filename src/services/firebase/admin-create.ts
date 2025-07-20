@@ -37,11 +37,11 @@ export async function createUser({ uid, email }: { uid: string, email: string })
 
 export async function createOrganisation({
     name,
-    ownerId,
+    uid,
     email
 }: {
     name: string;
-    ownerId: string;
+    uid: string;
     email: string;
 }): Promise<{ org?: IOrganisation, error?: unknown }> {
     try {
@@ -52,13 +52,24 @@ export async function createOrganisation({
         const organisation: IOrganisation = {
             id: orgRef.id,
             name,
-            ownerId,
+            ownerId: uid,
             members: 1,
             stripeCustomerId,
             createdAt: now,
+            subscription: "free"
         };
 
         await orgRef.set(organisation);
+
+        const userRef = firestoreAdmin.collection(usersCol).doc(uid);
+
+        await userRef.update({
+            organisation: {
+                id: organisation.id,
+                joinedAt: Date.now(),
+                role: "owner"
+            }
+        })
 
         return { org: organisation };
     } catch (error) {

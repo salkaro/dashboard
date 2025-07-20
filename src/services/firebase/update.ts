@@ -9,6 +9,8 @@ import { IOrganisation, OrgRoleType } from "@/models/organisation";
 import { ISensorMeta } from "@/models/sensor";
 import { IToken } from "@/models/token";
 import { IUser } from "@/models/user";
+import { incrementOrganisationMembersCount } from "./admin-increment";
+import { retrieveIdToken } from "./retrieve";
 
 
 export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation: string }) {
@@ -74,7 +76,7 @@ export async function updateAPIKey({ orgId, token, type, perms, prevId }: { orgI
 export async function updateUser({ user }: { user: IUser }) {
     try {
         const { id, ...updatableFields } = user;
-        
+
         const ref = doc(firestore, usersCol, id as string);
         await updateDoc(ref, updatableFields);
 
@@ -98,6 +100,7 @@ export async function updateOrganisation({ organisation }: { organisation: IOrga
     }
 }
 
+
 export async function updateDevice({ device, orgId, type }: { device: ISensorMeta; orgId: string; type: IDeviceType }): Promise<{ error?: string }> {
     try {
         if (!device.id) {
@@ -109,5 +112,32 @@ export async function updateDevice({ device, orgId, type }: { device: ISensorMet
         return {};
     } catch (error) {
         return { error: `${error}` };
+    }
+}
+
+
+export async function updateOrganisationMember({ member, organisation, remove }: { member: IUser, organisation?: IOrganisation, remove?: boolean }) {
+    try {
+        const userRef = doc(firestore, usersCol, member.id as string);
+
+        if (remove && organisation && organisation.members) {
+            const idToken = await retrieveIdToken();
+            if (!idToken) throw new Error("User not found");
+
+            await updateDoc(userRef, {
+                organisation: deleteField(),
+            });
+
+            await incrementOrganisationMembersCount({ idToken, orgId: organisation.id as string, negate: true })
+        }
+
+        await updateDoc(userRef, {
+            "organisation.role": member.organisation?.role,
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error(`Error in updateOrganisationMember: ${error}`);
+        return { error: `${error}` }
     }
 }
