@@ -22,7 +22,7 @@ export async function updateOnboarding({ firstname, lastname, organisation }: { 
             throw new Error("No authenticated user found.");
         }
 
-        const { org, error } = await createOrganisation({ name: organisation, ownerId: user.uid, email: user.email })
+        const { org, error } = await createOrganisation({ name: organisation, uid: user.uid, email: user.email })
         if (error || !org) throw error;
 
         const userRef = doc(firestore, usersCol, user.uid);
