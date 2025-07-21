@@ -42,7 +42,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
                 const path = window.location.pathname;
 
                 if (path == "/preparing") {
-                    router.push("/")
+                    router.push("/sensors")
                 }
             }
         })
