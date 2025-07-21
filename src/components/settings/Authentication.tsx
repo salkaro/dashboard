@@ -80,7 +80,6 @@ const Authentication = () => {
             const existing = tokens?.find(t => t.id === tokenId);
             if (!existing) return;
             const newToken = generateApiKey(Number(existing.id?.slice(-2)) as keyof typeof apiTokenAccessLevels, organisation.subscription);
-            console.log(newToken)
             newToken.name = existing.name;
             newToken.createdAt = Date.now();
             const { error } = await updateAPIKey({

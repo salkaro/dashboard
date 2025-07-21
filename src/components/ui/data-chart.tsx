@@ -63,19 +63,24 @@ const Chart: React.FC<Props> = ({ sensor, sensorReadings, timeRange }) => {
             return `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`
         }
 
-        // Accumulate numeric values per slot
-        const acc: Record<string, number> = {}
+        // Track total and count per slot
+        const acc: Record<string, { sum: number; count: number }> = {}
         filtered.forEach(r => {
-            const key = formatKey(r.timestamp!) // safe after filter
-            if (!(key in acc)) acc[key] = 0
-            // Safely extract value, default to false (0)
+            const key = formatKey(r.timestamp!)
             const raw: IReadingType = r.value ?? false
             const numeric = typeof raw === 'number' ? raw : raw === true ? 1 : 0
-            acc[key] += numeric
+
+            if (!(key in acc)) acc[key] = { sum: 0, count: 0 }
+            acc[key].sum += numeric
+            acc[key].count += 1
         })
-        // Map to array of { name, value }
-        return Object.entries(acc).map(([name, value]) => ({ name, value }))
-    }, [sensorReadings, timeRange])
+
+        // Map to array of { name, value } with averaged values
+        return Object.entries(acc).map(([name, { sum, count }]) => ({
+            name,
+            [sensor.units ?? "value"]: count > 0 ? sum / count : 0,
+        }))
+    }, [sensorReadings, timeRange, sensor])
 
     return (
         <Card>
@@ -111,7 +116,7 @@ const Chart: React.FC<Props> = ({ sensor, sensorReadings, timeRange }) => {
                             />
                             <Area
                                 type="natural"
-                                dataKey="value"
+                                dataKey={sensor.units ?? "value"}
                                 stroke="var(--chart-1)"
                                 fill="url(#colorReading)"
                                 activeDot={{ r: 4 }}

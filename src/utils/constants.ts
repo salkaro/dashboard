@@ -36,7 +36,7 @@ export const apiTokenAccessLevelsName = {
 
 
 export const memberLimits = {
-    "free": 5,
+    "free": 2,
     "hobby": 3,
     "essential": 10,
     "pro": 50,

@@ -35,7 +35,7 @@ const StripePricingTable = () => {
     }, []);
 
     return React.createElement("stripe-pricing-table", {
-        "pricing-table-id": theme === "dark" ? "prctbl_1RlEyTJtdRMvYIcKNKgxzTUg" : "prctbl_1RlEzqJtdRMvYIcKFgu8oyin",
+        "pricing-table-id": theme === "dark" ? process.env.NEXT_PUBLIC_DARK_PRICING_TABLE_ID : process.env.NEXT_PUBLIC_LIGHT_PRICING_TABLE_ID,
         "publishable-key": process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
         "customer-session-client-secret": clientSecret,
     })

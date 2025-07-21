@@ -51,7 +51,6 @@ export async function retrieveOrganisationMembers({ idToken, orgId }: { idToken:
 
         // Step 3: Check permission: must belong to orgId with level three perms
         const hasAccess = levelThreeAccess.includes(caller.organisation?.role as string);
-        console.log(hasAccess, caller.organisation?.id, orgId)
         if (
             caller.organisation?.id !== orgId || !hasAccess
         ) {
