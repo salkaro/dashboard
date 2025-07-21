@@ -16,9 +16,12 @@ interface Props {
 }
 
 const FirebaseProvider: React.FC<Props> = ({ children }) => {
-    const { status } = useSession();
-    const [showDialog, setShowDialog] = useState(false)
     const router = useRouter();
+    const { status } = useSession();
+
+    const [showDialog, setShowDialog] = useState(false);
+    const [firebaseInitialized, setFirebaseInitialized] = useState(false);
+    
 
     function getCookie(name: string): string | null {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -27,6 +30,8 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
+            setFirebaseInitialized(true);
+
             if (auth.currentUser) {
                 const isProd = process.env.NODE_ENV === "production";
                 const domain = isProd ? "; domain=.salkaro.com" : "";
@@ -46,6 +51,8 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
 
     useEffect(() => {
         async function trySignIn() {
+            if (!firebaseInitialized) return;
+
             const firebaseToken = getCookie('signInToken');
 
             if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
@@ -65,7 +72,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
         }
 
         trySignIn()
-    }, [status])
+    }, [status, firebaseInitialized])
 
     const handleReLogin = async () => {
         await signOut();

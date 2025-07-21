@@ -29,7 +29,7 @@ const items = [
 
 const footerItems = [
     { title: "Documentation", url: "https://docs.salkaro.com", icon: BookText },
-    { title: "Settings", url: "settings", icon: Settings },
+    { title: "Settings", url: "/settings", icon: Settings },
 ]
 
 // Sidebar component with inset variant

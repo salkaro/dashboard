@@ -41,7 +41,6 @@ const UpdateMemberDialog: React.FC<Props> = ({ member, organisation, refetch }) 
             if (idToken && member.organisation) {
                 member.organisation.role = levelOneAccess[Number(accessLevel)] as OrgRoleType;
                 const { error } = await updateOrganisationMember({ member, organisation });
-                console.log(error)
                 if (error) throw error
                 await refetch();
             }
