@@ -13,7 +13,7 @@ import { Label } from '../ui/label'
 import AddMemberDialog from './dialogs/AddMemberDialog'
 import { updateOrganisation } from '@/services/firebase/update'
 import { useSession } from 'next-auth/react'
-import { levelThreeAccess } from '@/utils/constants'
+import { levelThreeAccess, levelTwoAccess } from '@/utils/constants'
 import MembersTable from './MembersTable'
 import CreateOrganisation from './CreateOrganisation';
 import { IUser } from '@/models/user';
@@ -28,7 +28,9 @@ const Organisation = () => {
     const [updateOrg, setUpdateOrg] = useState<IOrganisation>();
     const [loading, setLoading] = useState(false);
 
+    const hasLevelTwoAccess = levelTwoAccess.includes(session?.user.organisation?.role as string);
     const hasLevelThreeAccess = levelThreeAccess.includes(session?.user.organisation?.role as string);
+    
 
     useEffect(() => {
         if (organisation) {
@@ -70,6 +72,15 @@ const Organisation = () => {
                 <>
                     <Card>
                         <CardContent className="grid gap-4">
+                            {hasLevelTwoAccess && (
+                                <div className="grid gap-2">
+                                    <Label>ID</Label>
+                                    <Input
+                                        value={organisation?.id || ""}
+                                        readOnly
+                                    />
+                                </div>
+                            )}
                             <div className="grid gap-2">
                                 <Label>Name</Label>
                                 <Input

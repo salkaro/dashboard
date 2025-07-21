@@ -1,6 +1,6 @@
 "use client";
 
-import { BookText, Home, RadioTower, Settings, Store } from "lucide-react"
+import { BookText, RadioTower, Settings, Store } from "lucide-react"
 
 import {
     Sidebar,
@@ -23,7 +23,7 @@ import { useOrganisation } from "@/hooks/useOrganisation";
 
 // Menu items
 const items = [
-    { title: "Dashboard", url: "/", icon: Home },
+    //{ title: "Dashboard", url: "/", icon: Home },
     { title: "Sensors", url: "/sensors", icon: RadioTower },
 ]
 
