@@ -36,6 +36,9 @@ const Billing = () => {
                 </Button>
             </div>
             <StripePricingTable />
+            <div className='mt-24'>   
+                <p className='text-muted-foreground text-sm'>If you need more, we do have available plans, please contact us at <span className='font-bold text-accent-foreground'>contact@salkaro.com</span></p>
+            </div>
         </div>
     )
 }

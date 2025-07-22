@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 // External Imports
 import React, { useState } from 'react'
-import { Loader2Icon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2Icon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { IconDotsVertical } from '@tabler/icons-react';
@@ -118,27 +118,29 @@ const MembersTable: React.FC<Props> = ({ organisation }) => {
                     </Table>
                 )}
             </CardContent>
-            <CardFooter className="grid grid-cols-12">
+            <CardFooter className="w-full flex justify-end">
                 <Button
                     size="sm"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className='col-span-3 md:col-span-1'
+                    className='rounded-r-none'
                 >
-                    Previous
+                    <ChevronLeft />
                 </Button>
-                <div className='col-span-6 md:col-span-10 flex justify-center'>
-                    <span className="text-sm">
-                        Page {page} of {pageCount || 1}
-                    </span>
-                </div>
+                <Button
+                    size="sm"
+                    className='flex justify-center rounded-none'
+                    disabled={page === pageCount || page === 1}
+                >
+                    {page} of {pageCount || 1}
+                </Button>
                 <Button
                     size="sm"
                     onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
                     disabled={page === pageCount}
-                    className='col-span-3 md:col-span-1'
+                    className='rounded-l-none'
                 >
-                    Next
+                    <ChevronRight />
                 </Button>
             </CardFooter>
         </Card>
