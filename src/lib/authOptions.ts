@@ -10,19 +10,18 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 
-const useSecure = process.env.NEXTAUTH_URL?.startsWith("https://");
-const host = new URL(process.env.NEXTAUTH_URL!).hostname;
+const isProd = process.env.NODE_ENV === "production";
 
 export const authOptions: NextAuthOptions = {
     cookies: {
         sessionToken: {
-            name: useSecure ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+            name: isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token",
             options: {
                 httpOnly: true,
                 sameSite: "None",
                 path: "/",
-                secure: useSecure,
-                domain: "." + host,
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
             },
         },
     },
