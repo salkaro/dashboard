@@ -1,16 +1,33 @@
 import { auth } from "@/lib/firebase/config";
 
-export function getCookie(name: string): string | null {
-    const uid = auth.currentUser?.uid as string;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; salkaro.${uid}.${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
+export function getCookie(name: string): unknown | null {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return null;
+    const match = document.cookie.match(
+        new RegExp(`(?:^|; )salkaro\\.${uid}\\.${name}=([^;]+)`)
+    );
+    if (!match) return null;
+    try {
+        const safe = match[1];
+        const binStr = atob(safe);
+        const bytes = Uint8Array.from(binStr, c => c.codePointAt(0)!);
+        const raw = new TextDecoder().decode(bytes);
+        return JSON.parse(raw);
+    } catch (err) {
+        console.error("cookie decode failed", err);
+        return null;
+    }
 }
 
 export function setCookie(name: string, value: string, options: { expires?: number; path?: string } = {}): void {
     const uid = auth.currentUser?.uid as string;
-    let cookie = `salkaro.${uid}.${name}=${value}; path=${options.path || '/'};`;
+    if (!uid) return;
+
+    const bytes = new TextEncoder().encode(value);
+    const binStr = Array.from(bytes, b => String.fromCodePoint(b)).join("");
+    const safe = btoa(binStr);
+
+    let cookie = `salkaro.${uid}.${name}=${safe}; path=${options.path || '/'};`;
 
     if (options.expires) {
         const date = new Date();
