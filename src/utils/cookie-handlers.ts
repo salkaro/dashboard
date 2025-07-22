@@ -1,6 +1,6 @@
 import { auth } from "@/lib/firebase/config";
 
-export function getCookie(name: string): unknown | null {
+export function getCookie(name: string): string | null {
     const uid = auth.currentUser?.uid;
     if (!uid) return null;
     const match = document.cookie.match(
@@ -11,8 +11,7 @@ export function getCookie(name: string): unknown | null {
         const safe = match[1];
         const binStr = atob(safe);
         const bytes = Uint8Array.from(binStr, c => c.codePointAt(0)!);
-        const raw = new TextDecoder().decode(bytes);
-        return JSON.parse(raw);
+        return new TextDecoder().decode(bytes);
     } catch (err) {
         console.error("cookie decode failed", err);
         return null;
