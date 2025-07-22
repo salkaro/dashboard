@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { browserLocalPersistence, onAuthStateChanged, onIdTokenChanged, setPersistence, signInWithCustomToken } from "firebase/auth"
+import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth"
 import { auth } from "@/lib/firebase/config"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -31,13 +31,6 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
         return match ? decodeURIComponent(match[2]) : null;
     }
 
-    // Set persistence once
-    useEffect(() => {
-        setPersistence(auth, browserLocalPersistence)
-            .catch(err => console.error("Failed to set persistence:", err))
-    }, [])
-
-
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
             setFirebaseInitialized(true);
@@ -58,18 +51,6 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
         })
         return unsubscribe
     }, [router])
-
-    // inside your FirebaseProvider component
-    useEffect(() => {
-        const unsubscribe = onIdTokenChanged(auth, async (user) => {
-            if (user) {
-                const token = await user.getIdToken(); // ensures it's fresh
-                document.cookie = `signInToken=${token}; path=/; samesite=Lax;` + (process.env.NODE_ENV === "production" ? "; domain=.salkaro.com; secure" : "");
-            }
-        });
-
-        return () => unsubscribe();
-    }, []);
 
     useEffect(() => {
         async function trySignIn() {
