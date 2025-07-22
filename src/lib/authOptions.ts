@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
             },
         },
         csrfToken: {
-            name: isProd ? "__Host-next-auth.csrf-token" : "next-auth.csrf-token",
+            name: isProd ? "__Secure-next-auth.csrf-token" : "next-auth.csrf-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
@@ -137,5 +137,5 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
         maxAge: 7 * 24 * 60 * 60, // 7 days
     },
-    secret: process.env.NEXTAUTH_SECRET
+    secret: process.env.NEXTAUTH_SECRET,
 };
