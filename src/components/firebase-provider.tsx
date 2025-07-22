@@ -29,10 +29,10 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     }
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async () => {
             setFirebaseInitialized(true);
 
-            if (user) {
+            if (auth.currentUser) {
                 const isProd = process.env.NODE_ENV === "production";
                 const domain = isProd ? "; domain=.salkaro.com" : "";
                 const secure = isProd ? "; secure" : "";
@@ -52,6 +52,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         async function trySignIn() {
             const firebaseToken = getCookie('signInToken');
+            console.log(firebaseToken)
 
             if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
                 try {
