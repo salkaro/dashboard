@@ -89,15 +89,31 @@ export const authOptions: NextAuthOptions = {
             return token;
         },
         async session({ session, token }) {
+            console.log('Session callback called with token:', !!token, 'user:', !!token?.user);
             const { user } = token as IJwtToken;
             try {
-                if (!user.id) return session;
+                if (!user?.id) {
+                    // Fallback to basic session data if no user ID
+                    session.user = {
+                        id: token.id as string,
+                        email: token.email as string,
+                    } as IUser;
+                    return session;
+                }
                 const userDoc = await retrieveUserAdmin({ uid: user.id }) as IUser;
                 if (userDoc) {
                     session.user = userDoc as IUser;
+                } else {
+                    // Fallback if userDoc retrieval fails
+                    session.user = user;
                 }
             } catch (error) {
                 console.error('Error retrieving user (session):', error);
+                // Ensure we still return a valid session with basic user data
+                session.user = user || {
+                    id: token.id as string,
+                    email: token.email as string,
+                } as IUser;
             }
             return session;
         },
