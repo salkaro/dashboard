@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth"
+import { browserLocalPersistence, onAuthStateChanged, setPersistence, signInWithCustomToken } from "firebase/auth"
 import { auth } from "@/lib/firebase/config"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -21,12 +21,19 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
 
     const [showDialog, setShowDialog] = useState(false);
     const [firebaseInitialized, setFirebaseInitialized] = useState(false);
-    
+
 
     function getCookie(name: string): string | null {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? decodeURIComponent(match[2]) : null;
     }
+
+    // Set persistence once
+    useEffect(() => {
+        setPersistence(auth, browserLocalPersistence)
+            .catch(err => console.error("Failed to set persistence:", err))
+    }, [])
+
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
