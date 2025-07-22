@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth"
+import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/firebase/config"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -20,26 +20,12 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     const { status } = useSession();
 
     const [showDialog, setShowDialog] = useState(false);
-    const [firebaseInitialized, setFirebaseInitialized] = useState(false);
-
-    // Fetches cookie differently to getCookie function in cookie-handlers.ts
-    function getCookie(name: string): string | null {
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? decodeURIComponent(match[2]) : null;
-    }
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
-            setFirebaseInitialized(true);
             console.log("2 USER", auth.currentUser)
 
             if (auth.currentUser) {
-                const isProd = process.env.NODE_ENV === "production";
-                const domain = isProd ? "; domain=.salkaro.com" : "";
-                const secure = isProd ? "; secure" : "";
-
-                document.cookie = `signInToken=; path=/${domain}; max-age=0${secure}; samesite=Lax`;
-
                 const path = window.location.pathname;
                 console.log("2 PATH", path)
 
@@ -51,41 +37,16 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
         return unsubscribe
     }, [router])
 
+
     useEffect(() => {
-        async function trySignIn() {
-            const firebaseToken = getCookie('signInToken');
-            console.log()
-            console.log()
-            console.log()
-            console.log("1 STATUS", status);
-            console.log("1 TOKEN", firebaseToken);
-            console.log("1 USER", auth.currentUser);
-            console.log()
-            console.log()
-            console.log()
-
-            if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
-                try {
-                    await signInWithCustomToken(auth, firebaseToken);
-                } catch (err) {
-                    setShowDialog(true)
-                    console.error('Firebase sign-in failed', err)
-                }
-            }
-
-            if (status !== 'loading' && !firebaseToken && !auth.currentUser) {
-                setShowDialog(true);
-            } else {
-                setShowDialog(false);
-            }
+        if (status === "unauthenticated") {
+            setShowDialog(true);
         }
-
-        trySignIn()
-    }, [status, firebaseInitialized])
+    }, [status])
 
     const handleReLogin = async () => {
-        await signOut("https://auth.salkaro.com/login");
-        router.push("https://auth.salkaro.com/login")
+        await signOut("/login");
+        router.push("/login")
     }
 
 

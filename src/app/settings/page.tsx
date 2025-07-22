@@ -1,3 +1,4 @@
+import Layout from "@/components/layout/layout";
 import Page from "@/components/settings/Page";
 import { Metadata } from "next";
 
@@ -21,6 +22,8 @@ export const metadata: Metadata = {
 
 export default function Settings() {
     return (
-        <Page />
+        <Layout>
+            <Page />
+        </Layout>
     );
 }

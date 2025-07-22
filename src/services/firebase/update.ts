@@ -1,9 +1,8 @@
 "use client";
 
-import { firestore } from "@/lib/firebase/config";
+import { auth, firestore } from "@/lib/firebase/config";
 import { apiKeysCol, devicesCol, IDeviceType, organisationsCol, tokensCol, usersCol } from "@/utils/constants";
-import { getAuth } from "firebase/auth";
-import { deleteDoc, deleteField, doc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, deleteField, doc, FieldValue, setDoc, updateDoc } from "firebase/firestore";
 import { createOrganisation } from "./admin-create";
 import { IOrganisation, OrgRoleType } from "@/models/organisation";
 import { ISensorMeta } from "@/models/sensor";
@@ -13,31 +12,41 @@ import { incrementOrganisationMembersCount } from "./admin-increment";
 import { retrieveIdToken } from "./retrieve";
 
 
-export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation: string }) {
+export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation?: string }) {
     try {
-        const auth = getAuth();
         const user = auth.currentUser;
 
         if (!user || !user.email) {
             throw new Error("No authenticated user found.");
         }
 
-        const { org, error } = await createOrganisation({ name: organisation, uid: user.uid, email: user.email })
-        if (error || !org) throw error;
 
         const userRef = doc(firestore, usersCol, user.uid);
 
-        await updateDoc(userRef, {
+        const updatePayload: { [x: string]: FieldValue | Partial<unknown> | undefined; } = {
             firstname,
             lastname,
-            organisation: {
+            "authentication.onboarding": deleteField(),
+        }
+
+
+        if (organisation) {
+            const { org, error } = await createOrganisation({
+                name: organisation,
+                ownerId: user.uid,
+                email: user.email,
+            })
+
+            if (error || !org) throw error
+
+            updatePayload.organisation = {
                 id: org.id,
                 role: "owner",
                 joinedAt: org.createdAt,
-            },
-            "authentication.onboarding": deleteField(),
-        });
+            }
+        }
 
+        await updateDoc(userRef, updatePayload);
     } catch (error) {
         console.error("Failed to update onboarding info:", error);
         throw error;

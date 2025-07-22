@@ -40,8 +40,8 @@ export function NavUser() {
     const { organisation } = useOrganisation();
     const hasLevelThreeAccess = levelThreeAccess.includes(session?.user.organisation?.role as string);
 
-    function handleSignOut() {
-        signOut()
+    async function handleSignOut() {
+        await signOut()
     };
 
     async function handleBillingPortal() {

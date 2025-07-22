@@ -1,4 +1,4 @@
-import Page from "@/components/dashboard/Page";
+import NotFoundInfo from "@/components/ui/not-found";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,6 +21,6 @@ export const metadata: Metadata = {
 
 export default function Home() {
     return (
-        <Page />
+        <NotFoundInfo />
     );
 }
