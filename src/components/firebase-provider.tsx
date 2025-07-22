@@ -22,6 +22,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     const [showDialog, setShowDialog] = useState(false);
     const [firebaseInitialized, setFirebaseInitialized] = useState(false);
 
+    // Fetches cookie differently to getCookie function in cookie-handlers.ts
     function getCookie(name: string): string | null {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? decodeURIComponent(match[2]) : null;
