@@ -22,6 +22,8 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     const [showDialog, setShowDialog] = useState(false);
     const [firebaseInitialized, setFirebaseInitialized] = useState(false);
 
+    console.log(auth)
+
 
     function getCookie(name: string): string | null {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -62,9 +64,6 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
             if (user) {
                 const token = await user.getIdToken(); // ensures it's fresh
                 document.cookie = `signInToken=${token}; path=/; samesite=Lax;` + (process.env.NODE_ENV === "production" ? "; domain=.salkaro.com; secure" : "");
-            } else {
-                // Optionally clear cookie on sign-out
-                document.cookie = "signInToken=; path=/; max-age=0; samesite=Lax" + (process.env.NODE_ENV === "production" ? "; domain=.salkaro.com; secure" : "");
             }
         });
 
