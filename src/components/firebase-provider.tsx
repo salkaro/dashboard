@@ -17,12 +17,13 @@ interface Props {
 
 const FirebaseProvider: React.FC<Props> = ({ children }) => {
     const router = useRouter();
-    const { status } = useSession();
+    const { data: session, status } = useSession();
 
     const [showDialog, setShowDialog] = useState(false);
     const [firebaseInitialized, setFirebaseInitialized] = useState(false);
 
     console.log(auth)
+    console.log(session)
 
 
     function getCookie(name: string): string | null {
