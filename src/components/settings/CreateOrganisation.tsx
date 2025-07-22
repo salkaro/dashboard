@@ -26,7 +26,7 @@ const CreateOrganisation: React.FC<Props> = ({ user, refetch }) => {
         setLoading(true)
         const { error } = await createOrganisation({
             name: name as string,
-            uid: user.id as string,
+            ownerId: user.id as string,
             email: user.email as string
         })
 

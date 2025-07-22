@@ -1,6 +1,5 @@
 "use client";
 
-import FirebaseProvider from "@/components/firebase-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
@@ -16,9 +15,7 @@ export default function Providers({ children }: Props) {
                 defaultTheme="dark"
                 disableTransitionOnChange
             >
-                <FirebaseProvider>
-                    {children}
-                </FirebaseProvider>
+                {children}
             </ThemeProvider>
         </SessionProvider>
     );

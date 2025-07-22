@@ -5,7 +5,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 // Local Imports
 import { Toaster } from "@/components/ui/sonner"
 import Providers from "./providers";
-import Layout from "@/components/layout/layout";
 
 // Styles
 import "@/styles/globals.css";
@@ -39,7 +38,7 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <Providers>
-                    <Layout>{children}</Layout>
+                    {children}
                     <Toaster />
                 </Providers>
             </body>

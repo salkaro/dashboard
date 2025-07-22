@@ -11,5 +11,5 @@ import { removeAllCookies } from "@/utils/cookie-handlers";
 export async function signOut(redirect?: string) {
     removeAllCookies();
     await firebaseSignout(auth);
-    await nextSignOut({ callbackUrl: redirect ? redirect : "https://salkaro.com" })
+    await nextSignOut({ callbackUrl: redirect ? redirect : "https://salkaro.com", redirect: true })
 }

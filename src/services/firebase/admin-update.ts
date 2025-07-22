@@ -7,7 +7,7 @@ import type { IMemberInvite } from "@/models/invite";
 import { FieldValue } from "firebase-admin/firestore";
 import { IOrganisation } from "@/models/organisation";
 
-export async function joinOrganisationAdmin({ code, uid }: { code: string; uid: string; }): Promise<{ organisation?: IOrganisation, error?: string }> {
+export async function joinOrganisationAdmin({ code, uid, firstname, lastname }: { code: string; uid: string; firstname?: string; lastname?: string }): Promise<{ error?: string }> {
     try {
         // Step 1: Fetch invite
         const inviteRef = firestoreAdmin.collection(inviteCodesCol).doc(code);
@@ -55,16 +55,23 @@ export async function joinOrganisationAdmin({ code, uid }: { code: string; uid: 
             role: invite.role as IUserOrganisation["role"],
             joinedAt: Date.now(),
         };
-        await userRef.update({
+
+        const updateData: Record<string, unknown> = {
             organisation: orgData,
-        });
+            "authentication.onboarding": FieldValue.delete(),
+        }
+        if (firstname && lastname) {
+            updateData.firstname = firstname;
+            updateData.lastname = lastname;
+        }
+        await userRef.update(updateData);
 
         // Step 8: Increment members count on the organisation document
         await orgRef.update({
             members: FieldValue.increment(1),
         });
 
-        return { organisation: orgData }
+        return {}
     } catch (error) {
         console.error("joinOrganisationAdmin error:", error);
         return { error: `${error}` }
