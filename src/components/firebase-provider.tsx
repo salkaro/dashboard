@@ -51,8 +51,6 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
 
     useEffect(() => {
         async function trySignIn() {
-            if (!firebaseInitialized) return;
-
             const firebaseToken = getCookie('signInToken');
 
             if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
