@@ -31,6 +31,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
             setFirebaseInitialized(true);
+            console.log("2 USER", auth.currentUser)
 
             if (auth.currentUser) {
                 const isProd = process.env.NODE_ENV === "production";
@@ -40,6 +41,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
                 document.cookie = `signInToken=; path=/${domain}; max-age=0${secure}; samesite=Lax`;
 
                 const path = window.location.pathname;
+                console.log("2 PATH", path)
 
                 if (path == "/preparing") {
                     router.push("/sensors")
@@ -52,7 +54,15 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         async function trySignIn() {
             const firebaseToken = getCookie('signInToken');
-            console.log(firebaseToken)
+            console.log()
+            console.log()
+            console.log()
+            console.log("1 STATUS", status);
+            console.log("1 TOKEN", firebaseToken);
+            console.log("1 USER", auth.currentUser);
+            console.log()
+            console.log()
+            console.log()
 
             if (status === 'authenticated' && firebaseToken && !auth.currentUser) {
                 try {
@@ -74,7 +84,7 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     }, [status, firebaseInitialized])
 
     const handleReLogin = async () => {
-        await signOut();
+        await signOut("https://auth.salkaro.com/login");
         router.push("https://auth.salkaro.com/login")
     }
 
