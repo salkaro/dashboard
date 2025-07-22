@@ -25,17 +25,16 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
     console.log(auth)
     console.log(session)
 
-
     function getCookie(name: string): string | null {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? decodeURIComponent(match[2]) : null;
     }
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async () => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setFirebaseInitialized(true);
 
-            if (auth.currentUser) {
+            if (user) {
                 const isProd = process.env.NODE_ENV === "production";
                 const domain = isProd ? "; domain=.salkaro.com" : "";
                 const secure = isProd ? "; secure" : "";
