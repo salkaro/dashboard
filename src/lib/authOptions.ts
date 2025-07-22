@@ -24,8 +24,17 @@ export const authOptions: NextAuthOptions = {
                 domain: isProd ? ".salkaro.com" : undefined,
             },
         },
+        callbackUrl: {
+            name: isProd ? "__Secure-next-auth.callback-url" : "next-auth.callback-url",
+            options: {
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+            },
+        },
         csrfToken: {
-            name: isProd ? "__Secure-next-auth.csrf-token" : "next-auth.csrf-token",
+            name: isProd ? "__Host-next-auth.csrf-token" : "next-auth.csrf-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
@@ -34,8 +43,30 @@ export const authOptions: NextAuthOptions = {
                 domain: isProd ? ".salkaro.com" : undefined,
             },
         },
-        callbackUrl: {
-            name: isProd ? "__Secure-next-auth.callback-url" : "next-auth.callback-url",
+        pkceCodeVerifier: {
+            name: isProd ? "__Secure-next-auth.pkce.code_verifier" : "next-auth.pkce.code_verifier",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+                maxAge: 900,
+            },
+        },
+        state: {
+            name: isProd ? "__Secure-next-auth.state" : "next-auth.state",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+                maxAge: 900,
+            },
+        },
+        nonce: {
+            name: isProd ? "__Secure-next-auth.nonce" : "next-auth.nonce",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
@@ -89,31 +120,15 @@ export const authOptions: NextAuthOptions = {
             return token;
         },
         async session({ session, token }) {
-            console.log('Session callback called with token:', !!token, 'user:', !!token?.user);
             const { user } = token as IJwtToken;
             try {
-                if (!user?.id) {
-                    // Fallback to basic session data if no user ID
-                    session.user = {
-                        id: token.id as string,
-                        email: token.email as string,
-                    } as IUser;
-                    return session;
-                }
+                if (!user.id) return session;
                 const userDoc = await retrieveUserAdmin({ uid: user.id }) as IUser;
                 if (userDoc) {
                     session.user = userDoc as IUser;
-                } else {
-                    // Fallback if userDoc retrieval fails
-                    session.user = user;
                 }
             } catch (error) {
                 console.error('Error retrieving user (session):', error);
-                // Ensure we still return a valid session with basic user data
-                session.user = user || {
-                    id: token.id as string,
-                    email: token.email as string,
-                } as IUser;
             }
             return session;
         },
@@ -122,5 +137,5 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
         maxAge: 7 * 24 * 60 * 60, // 7 days
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET
 };
