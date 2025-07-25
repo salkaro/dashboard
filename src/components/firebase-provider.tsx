@@ -23,11 +23,8 @@ const FirebaseProvider: React.FC<Props> = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async () => {
-            console.log("2 USER", auth.currentUser)
-
             if (auth.currentUser) {
                 const path = window.location.pathname;
-                console.log("2 PATH", path)
 
                 if (path == "/preparing") {
                     router.push("/sensors")
