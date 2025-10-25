@@ -19,6 +19,7 @@ import { useSession } from 'next-auth/react';
 import { levelTwoAccess, sensorLimits } from '@/utils/constants';
 import { useOrganisation } from '@/hooks/useOrganisation';
 import CreateOrganisationButton from '../../ui/create-organisation-button';
+import DeleteSensorDialog from './DeleteSensorDialog';
 
 const Page = () => {
     const router = useRouter();
@@ -53,12 +54,6 @@ const Page = () => {
         });
     }
 
-
-    function handleDelete(sensorId: string) {
-        if (hasLevelTwoAccess) {
-            deleteSensor(sensorId)
-        }
-    }
 
     const filteredSensors = sensors?.filter((sensor) => {
         const query = searchTerm.toLowerCase();
@@ -159,7 +154,7 @@ const Page = () => {
                                             <DropdownMenuContent align="end" className="w-32">
                                                 <EditSensorDialog fillSensor={sensor} editSensor={editSensor} />
                                                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(sensor.id ?? '')}>Copy ID</DropdownMenuItem>
-                                                <DropdownMenuItem variant="destructive" onClick={() => handleDelete(sensor.id as string)}>Delete</DropdownMenuItem>
+                                                <DeleteSensorDialog sensorId={sensor.id as string} deleteSensor={deleteSensor} />
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

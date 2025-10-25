@@ -24,13 +24,14 @@ interface Props {
     hitLimit: boolean;
 }
 const AddSensorDialog: React.FC<Props> = ({ addSensor, hitLimit }) => {
-    const [open, setOpen] = useState(false);
-    const [sensor, setSensor] = useState<Omit<ISensorMeta, "id" | "createdAt" | "orgId">>({
+    const emptySensor = {
         name: '',
         model: '',
         location: '',
         units: ''
-    });
+    }
+    const [open, setOpen] = useState(false);
+    const [sensor, setSensor] = useState<Omit<ISensorMeta, "id" | "createdAt" | "orgId">>(emptySensor);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     function handleChange(key: keyof typeof sensor, value: string) {
@@ -56,6 +57,7 @@ const AddSensorDialog: React.FC<Props> = ({ addSensor, hitLimit }) => {
         } finally {
             setIsSubmitting(false);
             setOpen(false);
+            setSensor(emptySensor)
         }
     }
 
@@ -73,7 +75,6 @@ const AddSensorDialog: React.FC<Props> = ({ addSensor, hitLimit }) => {
             </Button>
         )
     }
-
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

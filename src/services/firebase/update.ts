@@ -138,11 +138,11 @@ export async function updateOrganisationMember({ member, organisation, remove }:
             });
 
             await incrementOrganisationMembersCount({ idToken, orgId: organisation.id as string, negate: true })
+        } else {
+            await updateDoc(userRef, {
+                "organisation.role": member.organisation?.role,
+            });
         }
-
-        await updateDoc(userRef, {
-            "organisation.role": member.organisation?.role,
-        });
 
         return { success: true };
     } catch (error) {
